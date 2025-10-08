@@ -1,7 +1,12 @@
 from flask import Flask, render_template, request, jsonify
 import os
+from config import config
 
 app = Flask(__name__)
+
+# Load configuration based on environment
+config_name = os.environ.get('FLASK_ENV', 'default')
+app.config.from_object(config[config_name])
 
 # Sample data for demonstration
 tasks = [
