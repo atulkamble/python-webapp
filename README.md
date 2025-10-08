@@ -53,14 +53,73 @@ new-mit-project/
    ```
 
 4. **Run the application**:
+
+   **For Development:**
    ```bash
+   ./run_dev.sh
+   # or manually:
+   export FLASK_ENV=development
    python app.py
+   ```
+
+   **For Production:**
+   ```bash
+   ./run_prod.sh
+   # or manually:
+   export FLASK_ENV=production
+   gunicorn --bind 0.0.0.0:8080 --workers 4 app:app
    ```
 
 5. **Open your browser** and navigate to:
    ```
-   http://localhost:5000
+   http://localhost:5000  (development)
+   http://localhost:8080  (production)
    ```
+
+## Deployment Options
+
+### Option 1: Direct Server Deployment
+1. Copy files to your server
+2. Install dependencies: `pip install -r requirements.txt`
+3. Set environment variables:
+   ```bash
+   export FLASK_ENV=production
+   export PORT=8080
+   ```
+4. Run with gunicorn: `./run_prod.sh`
+
+### Option 2: Docker Deployment
+1. Build Docker image:
+   ```bash
+   docker build -t python-webapp .
+   ```
+2. Run container:
+   ```bash
+   docker run -p 8080:8080 python-webapp
+   ```
+
+### Option 3: Cloud Platform Deployment
+The app includes a `Procfile` for easy deployment to platforms like:
+- Heroku
+- Google Cloud Platform
+- AWS Elastic Beanstalk
+- Azure App Service
+
+#### Environment Variables for Production:
+- `FLASK_ENV=production`
+- `PORT` (auto-set by most cloud platforms)
+- `SECRET_KEY` (set a secure secret key)
+
+## Configuration
+
+The application supports multiple environments:
+- **Development**: Debug enabled, detailed error messages
+- **Production**: Optimized for performance and security
+
+Environment variables:
+- `FLASK_ENV`: Set to 'development' or 'production'
+- `PORT`: Port number (defaults to 5000 for dev, 8080 for prod)
+- `SECRET_KEY`: Secret key for session management
 
 ## API Endpoints
 
