@@ -2,8 +2,8 @@ trigger:
   - main
 
 schedules:
-  - cron: "0 0 * * *"
-    displayName: "Daily Midnight Build"
+  - cron: "* * * * *"
+    displayName: "Every Minute Build"
     branches:
       include:
         - main
