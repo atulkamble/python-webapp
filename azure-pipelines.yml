@@ -7,22 +7,89 @@ pool:
 variables:
   azureServiceConnection: 'AzureWebAppServiceConnection'
   appName: 'myapp98600'
-  appPlan: 'ASP-webapp-899e'
-  packagePath: '$(System.DefaultWorkingDirectory)/path/to/your/package.zip'
+  pythonVersion: '3.12'
+  artifactName: 'python-app'
 
 stages:
+
+# =========================================================
+# STAGE 1: BUILD
+# =========================================================
+
+  - stage: Build
+    displayName: 'Build Python Application'
+
+    jobs:
+      - job: BuildJob
+        displayName: 'Build Job'
+
+        steps:
+
+          # Checkout source code
+          - checkout: self
+
+          # Install Python
+          - task: UsePythonVersion@0
+            displayName: 'Install Python'
+            inputs:
+              versionSpec: '$(pythonVersion)'
+              addToPath: true
+
+          # Install dependencies
+          - script: |
+              python -m pip install --upgrade pip
+
+              if [ -f requirements.txt ]; then
+                pip install -r requirements.txt
+              fi
+            displayName: 'Install Dependencies'
+
+          # Create ZIP package
+          - task: ArchiveFiles@2
+            displayName: 'Create Deployment ZIP'
+            inputs:
+              rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+              includeRootFolder: false
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/$(artifactName).zip'
+              replaceExistingArchive: true
+
+          # Publish artifact
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish Application Artifact'
+            inputs:
+              targetPath: '$(Build.ArtifactStagingDirectory)/$(artifactName).zip'
+              artifact: '$(artifactName)'
+              publishLocation: 'pipeline'
+
+
+# =========================================================
+# STAGE 2: DEPLOY
+# =========================================================
+
   - stage: Deploy
-    displayName: 'Azure Web App Deployment'
+    displayName: 'Deploy to Azure Web App'
+    dependsOn: Build
+    condition: succeeded()
 
     jobs:
       - job: DeployWebApp
         displayName: 'Deploy Web App'
 
         steps:
+
+          # Download artifact
+          - task: DownloadPipelineArtifact@2
+            displayName: 'Download Application Artifact'
+            inputs:
+              artifact: '$(artifactName)'
+              path: '$(Pipeline.Workspace)/$(artifactName)'
+
+          # Deploy to Azure Web App
           - task: AzureWebApp@1
-            displayName: 'Deploy to Azure Web App'
+            displayName: 'Deploy Python App'
             inputs:
               azureSubscription: '$(azureServiceConnection)'
               appType: 'webAppLinux'
               appName: '$(appName)'
-              package: '$(packagePath)'
+              package: '$(Pipeline.Workspace)/$(artifactName)/$(artifactName).zip'
