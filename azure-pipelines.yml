@@ -1,0 +1,25 @@
+trigger: 
+  - main 
+
+  pool:
+    vmImage: 'ubuntu-latest'
+
+variables:
+  azureserviceconnection: 'AzureWebAppServiceConnection'
+  appName: 'myapp98600'
+  appPlan: 'ASP-webapp-899e'
+  packagePath: '$(System.DefaultWorkingDirectory)/path/to/your/package.zip'    
+
+stages: 
+  stage: 
+    - stage: Azure Web App Deployment
+      jobs: 
+        - job: DeployWebApp
+          steps:
+            - task: AzureWebApp@1
+              inputs:
+                azureSubscription: 'YourAzureSubscription'
+                appName: 'YourWebAppName'
+                package: '$(System.DefaultWorkingDirectory)/path/to/your/package.zip'    
+
+                
