@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: DaemonSet
+
+metadata:
+  name: pythonwebapp-ds
+
+spec:
+  selector:
+    matchLabels:
+      app: pythonwebapp
+
+  template:
+    metadata:
+      labels:
+        app: pythonwebapp
+
+    spec:
+      containers:
+        - name: pythonwebapp
+          image: docker.io/atuljkamble/pythonwebapp
+          ports:
+            - containerPort: 8080
