@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+
+metadata:
+  name: pythonwebapp-rs
+
+spec:
+  replicas: 3
+
+  selector:
+    matchLabels:
+      app: pythonwebapp
+
+  template:
+    metadata:
+      labels:
+        app: pythonwebapp
+
+    spec:
+      containers:
+        - name: pythonwebapp
+          image: docker.io/atuljkamble/pythonwebapp
+          ports:
+            - containerPort: 8080

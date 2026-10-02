@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pythonwebapp
+
+spec:
+  containers:
+    - name: pythonwebapp
+      image: docker.io/atuljkamble/pythonwebapp
+      ports:
+        - containerPort: 8080
